@@ -1,4 +1,4 @@
-const TOTAL_MS = 25 * 60 * 1000;
+const TOTAL_MS = 20 * 1000; // TEMPORARY test length (normal: 25 * 60 * 1000)
 
 const screen = document.querySelector('.screen');
 const label = document.querySelector('.label');
