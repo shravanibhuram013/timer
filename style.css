@@ -19,6 +19,12 @@ body {
   inset: -40px;
   background: linear-gradient(200deg, #2d4a3e 0%, #8aa68b 40%, #e8d9a8 70%, #b5651d 100%);
   filter: blur(14px);
+  transition: filter 0.4s;
+}
+
+/* Running or paused: a little less blur, as in the design */
+.is-running .art {
+  filter: blur(6px);
 }
 
 .panel {
