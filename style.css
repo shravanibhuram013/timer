@@ -1,7 +1,89 @@
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  min-height: 100vh;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #1c1c1c;
+}
+
+.screen {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Placeholder for the painting (blurred) */
+.art {
+  position: absolute;
+  inset: -40px;
+  background: linear-gradient(200deg, #2d4a3e 0%, #8aa68b 40%, #e8d9a8 70%, #b5651d 100%);
+  filter: blur(14px);
+}
+
+.panel {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 16px;
+  padding: 18px;
+  background: #f6f1e7;
+  border: 1px solid #1c1c1c;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.panel p { margin: 0; }
+
+.label {
+  font-style: italic;
+  opacity: 0.7;
+  font-size: 15px;
+}
+
+.time {
+  font-size: 56px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.buttons {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.btn {
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: #1c1c1c;
+  background: transparent;
+  border: 1px solid #1c1c1c;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.btn.main {
+  background: #1c1c1c;
+  color: #f6f1e7;
+}
+
+/* Laptop-sized screens: panel floats on the right, centred up and down */
+@media (min-width: 700px) {
+  .panel {
+    left: auto;
+    right: 8%;
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 340px;
+    padding: 28px;
+  }
+  .label { font-size: 17px; }
+  .time { font-size: 84px; }
+  .btn { padding: 12px 22px; font-size: 16px; }
 }
