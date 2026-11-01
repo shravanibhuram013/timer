@@ -13,6 +13,11 @@ const setter = document.querySelector('.setter');
 const minsInput = document.querySelector('.mins');
 const secsInput = document.querySelector('.secs');
 const message = document.querySelector('.message');
+const artImg = document.querySelector('.art-img');
+const nameEl = document.querySelector('.name');
+const artistEl = document.querySelector('.artist');
+const yearEl = document.querySelector('.year');
+const linkEl = document.querySelector('.link');
 const popup = document.querySelector('.popup');
 const popupText = document.querySelector('.popup-text');
 
@@ -29,6 +34,78 @@ function format(ms) {
   const m = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
   const s = String(totalSeconds % 60).padStart(2, '0');
   return m + ':' + s;
+}
+
+// ---- The painting (from the Met Museum's free public API) ----
+const MET_API = 'https://collectionapi.metmuseum.org/public/collection';
+const SEARCH_URL = MET_API + '/v1.1/search?hasImages=true&medium=Paintings&departmentId=11';
+
+let painting = null; // the details of the painting on screen, from the same record as its image
+let paintingTotal = 0; // how many matching paintings the Met has
+let loadId = 0; // lets us ignore an answer that arrives after a newer request
+
+async function getJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Met API answered ' + response.status);
+  return response.json();
+}
+
+function qualifies(o) {
+  return (
+    o &&
+    o.isPublicDomain === true &&
+    typeof o.classification === 'string' && o.classification.includes('Painting') &&
+    typeof o.primaryImageSmall === 'string' &&
+    o.primaryImageSmall.startsWith('https://images.metmuseum.org/') &&
+    typeof o.objectURL === 'string' &&
+    o.objectURL.startsWith('https://www.metmuseum.org/')
+  );
+}
+
+async function loadPainting() {
+  const myId = ++loadId;
+  painting = null;
+  artImg.hidden = true;
+  artImg.removeAttribute('src');
+
+  for (let attempt = 0; attempt < 15; attempt++) {
+    if (!paintingTotal) {
+      paintingTotal = (await getJson(SEARCH_URL + '&limit=1')).total;
+    }
+    const offset = Math.floor(Math.random() * paintingTotal);
+    const found = await getJson(SEARCH_URL + '&limit=1&offset=' + offset);
+    const id = found.objectIDs && found.objectIDs[0];
+    if (!id) continue;
+    const record = await getJson(MET_API + '/v1/objects/' + id);
+    if (myId !== loadId) return; // a newer request replaced this one
+    if (!qualifies(record)) continue; // quietly pick another
+
+    painting = {
+      title: record.title,
+      artist: record.artistDisplayName || 'Unknown',
+      year: record.objectDate || 'Unknown',
+      url: record.objectURL,
+    };
+    artImg.src = record.primaryImageSmall;
+    artImg.hidden = false;
+    if (state === 'finished') fillDetails();
+    return;
+  }
+}
+
+function fillDetails() {
+  if (!painting) return;
+  nameEl.textContent = painting.title;
+  artistEl.textContent = painting.artist;
+  yearEl.textContent = painting.year;
+  linkEl.href = painting.url;
+}
+
+function clearDetails() {
+  nameEl.textContent = '';
+  artistEl.textContent = '';
+  yearEl.textContent = '';
+  linkEl.removeAttribute('href');
 }
 
 function showMessage(text) {
@@ -113,6 +190,7 @@ function render() {
   mainBtn.hidden = finished;
   resetBtn.hidden = finished;
   restartBtn.hidden = !finished;
+  if (finished) fillDetails(); else clearDetails();
   details.hidden = !finished;
   setter.hidden = state !== 'before'; // length can only be changed before starting
   if (state !== 'before') showMessage('');
@@ -170,8 +248,13 @@ function reset() {
 }
 
 resetBtn.addEventListener('click', reset);
-restartBtn.addEventListener('click', reset);
+restartBtn.addEventListener('click', () => {
+  reset();
+  loadPainting();
+});
 
 document.addEventListener('visibilitychange', () => {
   if (state === 'running') tick();
 });
+
+loadPainting();
