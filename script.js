@@ -13,11 +13,14 @@ const setter = document.querySelector('.setter');
 const minsInput = document.querySelector('.mins');
 const secsInput = document.querySelector('.secs');
 const message = document.querySelector('.message');
+const popup = document.querySelector('.popup');
+const popupText = document.querySelector('.popup-text');
 
 let state = 'before'; // before | running | paused | finished
 let totalMs = DEFAULT_MS; // the last valid length
 let remainingMs = DEFAULT_MS;
-let badLength = false; // true while the boxes hold a length that is not allowed // time left when not running
+let badLength = false; // true while the boxes hold a length that is not allowed
+let lastProblem = ''; // the latest problem message // time left when not running
 let endTime = 0; // clock time when the countdown reaches zero
 let timerId = null;
 
@@ -32,6 +35,18 @@ function showMessage(text) {
   message.textContent = text;
   message.hidden = !text;
 }
+
+function showPopup(text) {
+  if (popup.open) return;
+  popupText.textContent = text;
+  popup.showModal();
+}
+
+popup.addEventListener('close', () => {
+  // The boxes were already put back to the last valid length
+  badLength = false;
+  showMessage('');
+});
 
 function fillBoxes() {
   const totalSeconds = totalMs / 1000;
@@ -61,6 +76,7 @@ function onLengthTyped() {
   const result = readLength();
   if (typeof result === 'string') {
     badLength = true;
+    lastProblem = result;
     showMessage(result); // keep the last valid length
     return;
   }
@@ -77,7 +93,7 @@ function onLengthDone(event) {
   if (setter.contains(event.relatedTarget)) return;
   if (typeof readLength() === 'string') {
     fillBoxes();
-    // the message stays visible so the person knows why the boxes changed
+    showPopup(lastProblem);
   }
 }
 
@@ -133,9 +149,9 @@ mainBtn.addEventListener('click', () => {
   } else {
     if (state === 'before' && badLength) {
       // Do not start with a length different from what the boxes say
-      badLength = false;
       fillBoxes();
-      return; // the message stays on screen
+      showPopup(lastProblem);
+      return;
     }
     startCounting();
   }

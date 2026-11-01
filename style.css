@@ -119,6 +119,35 @@ body {
   color: #8a2b1d;
 }
 
+/* Pop-up for a time that is not allowed */
+.popup {
+  width: min(340px, calc(100vw - 32px));
+  padding: 24px;
+  font-family: inherit;
+  color: #1c1c1c;
+  background: #f6f1e7;
+  border: 1px solid #1c1c1c;
+  border-radius: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.popup::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.popup p { margin: 0; }
+
+.popup-title {
+  font-style: italic;
+  font-size: 22px;
+}
+
+.popup-text {
+  margin: 10px 0 18px !important;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
 /* Finished: painting is fully sharp, details appear */
 .is-finished .art {
   filter: none;
