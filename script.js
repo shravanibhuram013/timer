@@ -14,6 +14,7 @@ const minsInput = document.querySelector('.mins');
 const secsInput = document.querySelector('.secs');
 const message = document.querySelector('.message');
 const artFrame = document.querySelector('.art-frame');
+const artStatus = document.querySelector('.art-status');
 const artImg = document.querySelector('.art-img');
 const nameEl = document.querySelector('.name');
 const artistEl = document.querySelector('.artist');
@@ -45,10 +46,41 @@ let painting = null; // the details of the painting on screen, from the same rec
 let paintingTotal = 0; // how many matching paintings the Met has
 let loadId = 0; // lets us ignore an answer that arrives after a newer request
 
+const WAIT_MS = 10000; // how long we wait for the Met before giving up
+const MAX_PAINTINGS = 5; // how many different paintings we try
+
+const LOADING_TEXT = 'Loading painting\u2026';
+const FAILED_TEXT = "We couldn't load a painting right now. You can still use the timer. Refresh the page to try again.";
+
 async function getJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Met API answered ' + response.status);
-  return response.json();
+  const stopper = new AbortController();
+  const timer = setTimeout(() => stopper.abort(), WAIT_MS);
+  try {
+    const response = await fetch(url, { signal: stopper.signal });
+    if (!response.ok) throw new Error('Met API answered ' + response.status);
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Checks the image really loads. Returns 'ok' or 'broken'. Throws if it is too slow.
+function checkImage(url) {
+  return new Promise((resolve, reject) => {
+    const test = new Image();
+    const timer = setTimeout(() => {
+      test.onload = test.onerror = null;
+      reject(new Error('Image took too long'));
+    }, WAIT_MS);
+    test.onload = () => { clearTimeout(timer); resolve('ok'); };
+    test.onerror = () => { clearTimeout(timer); resolve('broken'); };
+    test.src = url;
+  });
+}
+
+function showStatus(text) {
+  artStatus.textContent = text;
+  artStatus.hidden = !text;
 }
 
 function qualifies(o) {
@@ -68,30 +100,47 @@ async function loadPainting() {
   painting = null;
   artImg.hidden = true;
   artImg.removeAttribute('src');
+  showStatus(LOADING_TEXT);
 
-  for (let attempt = 0; attempt < 15; attempt++) {
-    if (!paintingTotal) {
-      paintingTotal = (await getJson(SEARCH_URL + '&limit=1')).total;
+  try {
+    for (let attempt = 0; attempt < MAX_PAINTINGS; attempt++) {
+      if (!paintingTotal) {
+        paintingTotal = (await getJson(SEARCH_URL + '&limit=1')).total;
+      }
+      const offset = Math.floor(Math.random() * paintingTotal);
+      const found = await getJson(SEARCH_URL + '&limit=1&offset=' + offset);
+      const id = found.objectIDs && found.objectIDs[0];
+      if (myId !== loadId) return; // a newer request replaced this one
+      if (!id) continue;
+      const record = await getJson(MET_API + '/v1/objects/' + id);
+      if (myId !== loadId) return;
+      if (!qualifies(record)) continue; // not a painting, not public domain, or no image: quietly pick another
+
+      const imageResult = await checkImage(record.primaryImageSmall);
+      if (myId !== loadId) return;
+      if (imageResult !== 'ok') continue; // the image does not load: quietly pick another
+
+      // Show the painting and its details only now, from this one record
+      painting = {
+        title: record.title,
+        artist: record.artistDisplayName || 'Unknown',
+        year: record.objectDate || 'Unknown',
+        url: record.objectURL,
+      };
+      artImg.src = record.primaryImageSmall;
+      showStatus('');
+      artImg.hidden = false;
+      updateBlur(); // already blurred by the time it is shown
+      if (state === 'finished') render();
+      return;
     }
-    const offset = Math.floor(Math.random() * paintingTotal);
-    const found = await getJson(SEARCH_URL + '&limit=1&offset=' + offset);
-    const id = found.objectIDs && found.objectIDs[0];
-    if (!id) continue;
-    const record = await getJson(MET_API + '/v1/objects/' + id);
-    if (myId !== loadId) return; // a newer request replaced this one
-    if (!qualifies(record)) continue; // quietly pick another
-
-    painting = {
-      title: record.title,
-      artist: record.artistDisplayName || 'Unknown',
-      year: record.objectDate || 'Unknown',
-      url: record.objectURL,
-    };
-    updateBlur(); // already blurred by the time it is shown
-    artImg.src = record.primaryImageSmall;
-    artImg.hidden = false;
-    if (state === 'finished') fillDetails();
-    return;
+  } catch (error) {
+    if (myId !== loadId) return;
+  }
+  // No painting could be loaded (the Met did not answer, or 5 paintings did not work)
+  if (myId === loadId) {
+    painting = null;
+    showStatus(FAILED_TEXT);
   }
 }
 
@@ -214,7 +263,7 @@ function render() {
   resetBtn.hidden = finished;
   restartBtn.hidden = !finished;
   if (finished) fillDetails(); else clearDetails();
-  details.hidden = !finished;
+  details.hidden = !(finished && painting); // no painting, no details
   updateBlur();
   if (state === 'running' && blurFrame === null) blurFrame = requestAnimationFrame(blurLoop);
   setter.hidden = state !== 'before'; // length can only be changed before starting
@@ -286,3 +335,10 @@ loadPainting();
 
 window.addEventListener('resize', updateBlur);
 artImg.addEventListener('load', updateBlur);
+artImg.addEventListener('error', () => {
+  // never show a broken image
+  artImg.hidden = true;
+  painting = null;
+  showStatus(FAILED_TEXT);
+  render();
+});

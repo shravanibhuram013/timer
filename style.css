@@ -29,6 +29,17 @@ body {
   container-type: size; /* lets the painting measure the space it may fill */
 }
 
+/* Messages in the artwork area: "Loading painting..." and "couldn't load" */
+.art-status {
+  margin: 0;
+  max-width: 30ch;
+  text-align: center;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #f6f1e7;
+}
+
 /* The frame is exactly as big as the painting; the blur is clipped to it */
 .art-frame {
   --blur: 40px; /* strong until the script sets the real amount */
