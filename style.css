@@ -26,12 +26,29 @@ body {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  container-type: size; /* lets the painting measure the space it may fill */
+}
+
+/* The frame is exactly as big as the painting; the blur is clipped to it */
+.art-frame {
+  --blur: 40px; /* strong until the script sets the real amount */
+  position: relative;
+  overflow: hidden;
+}
+
+.art-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  pointer-events: none;
 }
 
 .art-img {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 100cqw;
+  max-height: 100cqh;
   width: auto;
   height: auto;
   object-fit: contain;

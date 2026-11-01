@@ -13,6 +13,7 @@ const setter = document.querySelector('.setter');
 const minsInput = document.querySelector('.mins');
 const secsInput = document.querySelector('.secs');
 const message = document.querySelector('.message');
+const artFrame = document.querySelector('.art-frame');
 const artImg = document.querySelector('.art-img');
 const nameEl = document.querySelector('.name');
 const artistEl = document.querySelector('.artist');
@@ -86,6 +87,7 @@ async function loadPainting() {
       year: record.objectDate || 'Unknown',
       url: record.objectURL,
     };
+    updateBlur(); // already blurred by the time it is shown
     artImg.src = record.primaryImageSmall;
     artImg.hidden = false;
     if (state === 'finished') fillDetails();
@@ -179,8 +181,29 @@ function onLengthDone(event) {
 });
 setter.addEventListener('focusout', onLengthDone);
 
+// Time left, the same number the timer shows
+function timeLeftMs() {
+  return state === 'running' ? Math.max(0, endTime - Date.now()) : remainingMs;
+}
+
+// Blur: strong at the full length, none at 00:00, based on time left
+const BLUR_FRACTION = 0.09; // starting blur as a share of the painting's average size
+let blurFrame = null;
+
+function updateBlur() {
+  const left = Math.min(1, Math.max(0, timeLeftMs() / totalMs));
+  const side = Math.sqrt(artImg.offsetWidth * artImg.offsetHeight) || 400;
+  const blur = left * BLUR_FRACTION * side;
+  artFrame.style.setProperty('--blur', blur.toFixed(2) + 'px');
+}
+
+function blurLoop() {
+  updateBlur();
+  blurFrame = state === 'running' ? requestAnimationFrame(blurLoop) : null;
+}
+
 function render() {
-  const ms = state === 'running' ? Math.max(0, endTime - Date.now()) : remainingMs;
+  const ms = timeLeftMs();
   timeEl.textContent = format(ms);
   const finished = state === 'finished';
   screen.classList.toggle('is-running', state === 'running' || state === 'paused');
@@ -192,6 +215,8 @@ function render() {
   restartBtn.hidden = !finished;
   if (finished) fillDetails(); else clearDetails();
   details.hidden = !finished;
+  updateBlur();
+  if (state === 'running' && blurFrame === null) blurFrame = requestAnimationFrame(blurLoop);
   setter.hidden = state !== 'before'; // length can only be changed before starting
   if (state !== 'before') showMessage('');
 }
@@ -258,3 +283,6 @@ document.addEventListener('visibilitychange', () => {
 });
 
 loadPainting();
+
+window.addEventListener('resize', updateBlur);
+artImg.addEventListener('load', updateBlur);
