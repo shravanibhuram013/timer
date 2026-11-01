@@ -80,6 +80,45 @@ body {
   color: #f6f1e7;
 }
 
+/* Length boxes (only shown before starting) */
+.setter {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.setter label {
+  font-style: italic;
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.setter input {
+  display: block;
+  width: 80px;
+  margin-top: 4px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 18px;
+  font-style: normal;
+  color: #1c1c1c;
+  background: #fff;
+  border: 1px solid #1c1c1c;
+  border-radius: 0;
+}
+
+.setter input:focus-visible {
+  outline: 2px solid #1c1c1c;
+  outline-offset: 2px;
+}
+
+.message {
+  margin-top: 10px !important;
+  font-style: italic;
+  font-size: 15px;
+  color: #8a2b1d;
+}
+
 /* Finished: painting is fully sharp, details appear */
 .is-finished .art {
   filter: none;
