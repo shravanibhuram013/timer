@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Midnight Gallery – mockup</title>
+  <style>
+
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; }
+h1 { margin: 0 0 4px; } h2 { margin: 28px 0 12px; font-size: 18px; }
+.note { margin: 0; opacity: .7; }
+.row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+figure { margin: 0; } figcaption { margin-top: 8px; font-size: 14px; }
+.device { position: relative; overflow: hidden; border: 6px solid #111; }
+.laptop { width: 520px; height: 325px; border-radius: 10px; --time: 54px; --pad: 18px; --fs: 14px; }
+.phone { width: 230px; height: 460px; border-radius: 28px; --time: 44px; --pad: 14px; --fs: 13px; }
+.screen { position: absolute; inset: 0; overflow: hidden; font-size: var(--fs); }
+.art { position: absolute; inset: -30px; }
+.before .art, .running .art { filter: blur(14px); }
+.running .art { filter: blur(6px); }
+.panel { position: absolute; padding: var(--pad); }
+.panel p { margin: 0; }
+.time { font-size: var(--time); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.btn { display: inline-block; padding: 8px 14px; }
+.details { margin-top: 10px; line-height: 1.4; }
+
+body { background: #0b0b14; color: #f2f2f7; font-family: Helvetica, Arial, sans-serif; }
+.art { background: linear-gradient(160deg, #0f4c5c 0%, #e36414 55%, #fb8b24 75%, #9a031e 100%); }
+.finished .art { filter: none; }
+.panel { left: 50%; bottom: 14px; transform: translateX(-50%); width: calc(100% - 28px); max-width: 360px; text-align: center; background: rgba(8,8,18,.62); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,.18); }
+.label { text-transform: uppercase; letter-spacing: .18em; font-size: 11px; opacity: .75; }
+.time { font-weight: 700; }
+.buttons { justify-content: center; }
+.btn { border-radius: 999px; border: 1px solid rgba(255,255,255,.4); font-weight: 600; }
+.btn.main { background: #ffd60a; color: #111; border-color: #ffd60a; }
+.details p { margin: 2px 0; } .details .name { font-weight: 700; font-size: 1.15em; }
+.link { color: #ffd60a; text-decoration: underline; }
+.phone .panel { padding: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Midnight Gallery</h1>
+  <p class="note">Design mockup only. The coloured picture stands in for a real painting.</p>
+  <h2>Laptop screen</h2>
+  <div class="row">
+      <figure>
+        <div class="device laptop"><div class="screen before">
+          <div class="art"></div>
+          <div class="panel">
+            <p class="label">Ready</p>
+            <p class="time">25:00</p>
+            <div class="buttons"><span class="btn main">Start</span><span class="btn">Reset</span></div>
+
+          </div>
+        </div></div>
+        <figcaption>1. Before starting</figcaption>
+      </figure>
+      <figure>
+        <div class="device laptop"><div class="screen running">
+          <div class="art"></div>
+          <div class="panel">
+            <p class="label">Focus time</p>
+            <p class="time">17:42</p>
+            <div class="buttons"><span class="btn main">Pause</span><span class="btn">Reset</span></div>
+
+          </div>
+        </div></div>
+        <figcaption>2. Timer running</figcaption>
+      </figure>
+      <figure>
+        <div class="device laptop"><div class="screen finished">
+          <div class="art"></div>
+          <div class="panel">
+            <p class="label">Finished</p>
+            <p class="time">00:00</p>
+            <div class="buttons"><span class="btn main">Restart session</span></div>
+            <div class="details"><p class="name">Landscape</p><p>Carl Rottmann</p><p>ca. 1835–45</p><p class="link">Read about this painting &rarr;</p></div>
+          </div>
+        </div></div>
+        <figcaption>3. Timer finished</figcaption>
+      </figure>
+  </div>
+  <h2>Phone screen</h2>
+  <div class="row">
+      <figure>
+        <div class="device phone"><div class="screen before">
+          <div class="art"></div>
+          <div class="panel">
+            <p class="label">Ready</p>
+            <p class="time">25:00</p>
+            <div class="buttons"><span class="btn main">Start</span><span class="btn">Reset</span></div>
+
+          </div>
+        </div></div>
+        <figcaption>1. Before starting</figcaption>
+      </figure>
+      <figure>
+        <div class="device phone"><div class="screen running">
+          <div class="art"></div>
+          <div class="panel">
+            <p class="label">Focus time</p>
+            <p class="time">17:42</p>
+            <div class="buttons"><span class="btn main">Pause</span><span class="btn">Reset</span></div>
+
+          </div>
+        </div></div>
+        <figcaption>2. Timer running</figcaption>
+      </figure>
+      <figure>
+        <div class="device phone"><div class="screen finished">
+          <div class="art"></div>
+          <div class="panel">
+            <p class="label">Finished</p>
+            <p class="time">00:00</p>
+            <div class="buttons"><span class="btn main">Restart session</span></div>
+            <div class="details"><p class="name">Landscape</p><p>Carl Rottmann</p><p>ca. 1835–45</p><p class="link">Read about this painting &rarr;</p></div>
+          </div>
+        </div></div>
+        <figcaption>3. Timer finished</figcaption>
+      </figure>
+  </div>
+</body>
+</html>

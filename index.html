@@ -7,7 +7,45 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Pomodoro Art</h1>
+  <main class="screen">
+    <div class="art">
+      <p class="art-status" role="status">Loading painting&hellip;</p>
+      <div class="art-frame">
+        <img class="art-img" alt="A painting from the Met Museum" hidden>
+      </div>
+    </div>
+    <section class="panel">
+      <p class="label">Ready</p>
+      <p class="time">25:00</p>
+      <div class="setter">
+        <label>Minutes
+          <input class="mins" type="text" inputmode="numeric" maxlength="3" value="25" autocomplete="off">
+        </label>
+        <label>Seconds
+          <input class="secs" type="text" inputmode="numeric" maxlength="2" value="00" autocomplete="off">
+        </label>
+      </div>
+      <p class="message" role="alert" hidden></p>
+      <div class="buttons">
+        <button class="btn main" type="button">Start</button>
+        <button class="btn reset" type="button">Reset</button>
+        <button class="btn main restart" type="button" hidden>Restart session</button>
+      </div>
+      <div class="details" hidden>
+        <p class="name"></p>
+        <p class="artist"></p>
+        <p class="year"></p>
+        <p><a class="link" target="_blank" rel="noopener">Read about this painting &rarr;</a></p>
+      </div>
+    </section>
+  </main>
+  <dialog class="popup" aria-labelledby="popup-title">
+    <form method="dialog">
+      <p class="popup-title" id="popup-title">That time doesn't work</p>
+      <p class="popup-text"></p>
+      <button class="btn main" type="submit">OK</button>
+    </form>
+  </dialog>
   <script src="script.js"></script>
 </body>
 </html>
