@@ -16,7 +16,8 @@ const message = document.querySelector('.message');
 
 let state = 'before'; // before | running | paused | finished
 let totalMs = DEFAULT_MS; // the last valid length
-let remainingMs = DEFAULT_MS; // time left when not running
+let remainingMs = DEFAULT_MS;
+let badLength = false; // true while the boxes hold a length that is not allowed // time left when not running
 let endTime = 0; // clock time when the countdown reaches zero
 let timerId = null;
 
@@ -59,9 +60,11 @@ function onLengthTyped() {
   if (state !== 'before') return;
   const result = readLength();
   if (typeof result === 'string') {
+    badLength = true;
     showMessage(result); // keep the last valid length
     return;
   }
+  badLength = false;
   showMessage('');
   totalMs = result.ms;
   remainingMs = totalMs;
@@ -128,6 +131,12 @@ mainBtn.addEventListener('click', () => {
     state = 'paused';
     render();
   } else {
+    if (state === 'before' && badLength) {
+      // Do not start with a length different from what the boxes say
+      badLength = false;
+      fillBoxes();
+      return; // the message stays on screen
+    }
     startCounting();
   }
 });
@@ -138,6 +147,7 @@ function reset() {
   totalMs = DEFAULT_MS;
   remainingMs = DEFAULT_MS;
   state = 'before';
+  badLength = false;
   fillBoxes();
   showMessage('');
   render();
