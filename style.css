@@ -13,6 +13,8 @@ body {
   overflow: hidden;
 }
 
+[hidden] { display: none !important; }
+
 /* Placeholder for the painting (blurred) */
 .art {
   position: absolute;
@@ -78,6 +80,31 @@ body {
   color: #f6f1e7;
 }
 
+/* Finished: painting is fully sharp, details appear */
+.is-finished .art {
+  filter: none;
+}
+
+.details {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #1c1c1c;
+  line-height: 1.4;
+  font-size: 15px;
+}
+
+.details .name {
+  font-style: italic;
+  font-size: 1.2em;
+}
+
+.details .link {
+  display: inline-block;
+  margin-top: 6px;
+  color: #1c1c1c;
+  text-decoration: underline;
+}
+
 /* Laptop-sized screens: panel floats on the right, centred up and down */
 @media (min-width: 700px) {
   .panel {
@@ -92,4 +119,5 @@ body {
   .label { font-size: 17px; }
   .time { font-size: 84px; }
   .btn { padding: 12px 22px; font-size: 16px; }
+  .details { font-size: 17px; }
 }
